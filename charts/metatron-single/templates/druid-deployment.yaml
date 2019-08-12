@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "metatron-single.name" . }}-{{ .Values.druid.name }}
+  labels:
+{{ include "metatron-single.labels" . | indent 4 }}
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "metatron-single.name" . }}-{{ .Values.druid.name }}
+      app.kubernetes.io/instance: {{ .Release.Name }}-{{ .Values.druid.name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "metatron-single.name" . }}-{{ .Values.druid.name }}
+        app.kubernetes.io/instance: {{ .Release.Name }}-{{ .Values.druid.name }}
+    spec:
+      serviceAccountName: {{ include "metatron-single.name" . }}
+      volumes:
+      - name: config-volume
+        configMap:
+          name: {{ template "metatron-single.name" . }}-{{ .Values.druid.name }}-config
+      - name: ingested-volume
+        persistentVolumeClaim:
+          claimName: {{ include "metatron-single.name" . }}-polaris
+    {{- if and .Values.druid.persistence.enabled }}
+      - name: druid-backup
+        persistentVolumeClaim:
+          claimName: {{ include "metatron-single.name" . }}-{{ .Values.druid.name }}
+      securityContext:
+        {{- toYaml .Values.druid.podSecurityContext | nindent 8 }}
+    {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}-{{ .Values.druid.name }}
+          securityContext:
+            {{- toYaml .Values.druid.securityContext | nindent 12 }}
+          image: "{{ .Values.druid.image }}:{{ .Values.druid.tag }}"
+          imagePullPolicy: {{ .Values.druid.imagePullPolicy }}
+          command:
+          - sh
+          - -c
+          - |-
+            rm -rf /ingested/*;
+            sh /config/check-backup.sh && sh /config/run-single.sh
+          ports:
+            - name: coordinator
+              containerPort: 8081
+              protocol: TCP
+            - name: broker
+              containerPort: 8082
+              protocol: TCP
+            - name: overlord
+              containerPort: 8090
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.druid.resources | nindent 12 }}
+          volumeMounts:
+          - name: ingested-volume
+            mountPath: /ingested
+          - name: config-volume
+            mountPath: /config
+        {{- if and .Values.druid.persistence.enabled }}
+          - name : druid-backup
+            mountPath : /app/druid/var/druid
+        {{- end }}
+    {{- with .Values.druid.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.druid.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}

@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "metatron-single.name" . }}-{{ .Values.discovery.name }}-config
+  namespace: {{ .Release.Namespace }}
+data:
+  run.sh: |-
+    if [ -d /app/h2_backup/h2db ]; then
+      echo "Discovery has backup"
+      /app/metatron-discovery/bin/metatron.sh start
+    else
+      echo "Discovery has no backup, starting initialization"
+      /app/metatron-discovery/bin/metatron.sh --init start
+    fi;
+    while (/app/metatron-discovery/bin/metatron.sh status >/dev/null); do
+      sleep 30
+    done;
+    exit 1

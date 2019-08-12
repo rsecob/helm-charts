@@ -1,0 +1,2 @@
+Access app by running following command:
+  kubectl port-forward --namespace {{ .Release.Namespace }} service/{{ include "metatron-single.name" . }}-{{ .Values.discovery.name }} 8180:8180

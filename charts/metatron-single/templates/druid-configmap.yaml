@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "metatron-single.name" . }}-{{ .Values.druid.name }}-config
+  namespace: {{ .Release.Namespace }}
+data:
+  check-backup.sh: |-
+    if [ -d "/app/druid/var/druid/segments" ]; then
+        echo "druid backup exists!!"
+    else
+        echo "druid backup does not exists"
+        cp -rf /app/druid/var/druid.default/* /app/druid/var/druid
+    fi
+
+  run-single.sh: |-
+    nodes=(
+      "zookeeper"
+      "coordinator"
+      "broker"
+      "historical"
+      "middleManager"
+      "overlord"
+    )
+
+    java `cat conf/druid/single/jvm.config | xargs` \
+    -cp conf/_common:conf/druid:conf/druid/single:lib/*:/usr/local/Cellar/hadoop/2.7.2/libexec/etc/hadoop io.druid.cli.ServerRunnable \
+    ${nodes[@]} > /app/druid/log/single.log 2>&1 &
+    pid=$!
+
+    while kill -0 $pid > /dev/null 2>&1; do
+      sleep 30
+    done;
+    exit 1

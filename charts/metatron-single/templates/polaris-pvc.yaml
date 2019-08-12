@@ -1,0 +1,23 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ include "metatron-single.name" . }}-polaris
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ include "metatron-single.name" . }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: {{ .Values.polaris.persistence.size | quote }}
+{{- if .Values.polaris.persistence.storageClass }}
+{{- if (eq "-" .Values.polaris.persistence.storageClass) }}
+  storageClassName: ""
+{{- else }}
+  storageClassName: "{{ .Values.polaris.persistence.storageClass }}"
+{{- end }}
+{{- end }}

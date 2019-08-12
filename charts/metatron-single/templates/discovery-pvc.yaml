@@ -1,0 +1,29 @@
+{{- if and .Values.discovery.persistence.enabled }}
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ include "metatron-single.name" . }}-{{ .Values.discovery.name }}
+  namespace: {{ .Release.Namespace }}
+{{- with .Values.discovery.persistence.annotations  }}
+  annotations:
+{{ toYaml . | indent 4 }}
+{{- end }}
+  labels:
+    app: {{ include "metatron-single.name" . }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+spec:
+  accessModes:
+    - {{ .Values.discovery.persistence.accessMode | quote }}
+  resources:
+    requests:
+      storage: {{ .Values.discovery.persistence.size | quote }}
+{{- if .Values.discovery.persistence.storageClass }}
+{{- if (eq "-" .Values.discovery.persistence.storageClass) }}
+  storageClassName: ""
+{{- else }}
+  storageClassName: "{{ .Values.discovery.persistence.storageClass }}"
+{{- end }}
+{{- end }}
+{{- end }}

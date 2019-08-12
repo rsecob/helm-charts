@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "metatron-single.name" . }}-{{ .Values.discovery.name }}
+  labels:
+{{ include "metatron-single.labels" . | indent 4 }}
+spec:
+  type: {{ .Values.discovery.service.type }}
+  ports:
+    - port: 8180
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: {{ include "metatron-single.name" . }}-{{ .Values.discovery.name }}
+    app.kubernetes.io/instance: {{ .Release.Name }}-{{ .Values.discovery.name }}

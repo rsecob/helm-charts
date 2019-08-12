@@ -1,0 +1,29 @@
+{{- if and .Values.druid.persistence.enabled }}
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ include "metatron-single.name" . }}-{{ .Values.druid.name }}
+  namespace: {{ .Release.Namespace }}
+{{- with .Values.druid.persistence.annotations  }}
+  annotations:
+{{ toYaml . | indent 4 }}
+{{- end }}
+  labels:
+    app: {{ include "metatron-single.name" . }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+spec:
+  accessModes:
+    - {{ .Values.druid.persistence.accessMode | quote }}
+  resources:
+    requests:
+      storage: {{ .Values.druid.persistence.size | quote }}
+{{- if .Values.druid.persistence.storageClass }}
+{{- if (eq "-" .Values.druid.persistence.storageClass) }}
+  storageClassName: ""
+{{- else }}
+  storageClassName: "{{ .Values.druid.persistence.storageClass }}"
+{{- end }}
+{{- end }}
+{{- end }}
