@@ -8,6 +8,7 @@ discovery:
   tag: latest
   imagePullPolicy: IfNotPresent
 
+  extraLabels: {}
   resources: {}
   affinity: {}
   tolerations: {}
@@ -36,6 +37,7 @@ druid:
   tag: latest
   imagePullPolicy: IfNotPresent
 
+  extraLabels: {}
   resources: {}
   affinity: {}
   tolerations: {}
