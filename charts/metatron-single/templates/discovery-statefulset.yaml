@@ -1,5 +1,5 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: {{ include "metatron-single.name" . }}-{{ .Values.discovery.name }}
   labels:
@@ -12,6 +12,20 @@ spec:
     {{- with .Values.discovery.extraLabels }}
       {{- toYaml . | nindent 6 }}
     {{- end }}
+{{- if and .Values.discovery.persistence.enabled }}
+  volumeClaimTemplates:
+  - metadata:
+      name: h2-backup
+    spec:
+      accessModes:
+        - {{ .Values.discovery.persistence.accessMode | quote }}
+    {{- if .Values.discovery.persistence.storageClass }}
+      storageClassName: "{{ .Values.discovery.persistence.storageClass }}"
+    {{- end }}    
+      resources:
+        requests:
+          storage: {{ .Values.discovery.persistence.size | quote }}
+{{- end }}
   template:
     metadata:
       labels:
@@ -26,10 +40,9 @@ spec:
         - name: config-volume
           configMap:
             name: {{ template "metatron-single.name" . }}-{{ .Values.discovery.name }}-config
-      {{- if and .Values.discovery.persistence.enabled }}
+      {{- if not .Values.discovery.persistence.enabled }}
         - name: h2-backup
-          persistentVolumeClaim:
-            claimName: {{ include "metatron-single.name" . }}-{{ .Values.discovery.name }}
+          emptyDir: {}
       {{- end }}
         - name: ingested-volume
           persistentVolumeClaim:
@@ -56,10 +69,8 @@ spec:
             mountPath: /etc/config
           - name: ingested-volume
             mountPath: /ingested
-        {{- if and .Values.discovery.persistence.enabled }}
           - name: h2-backup
             mountPath: /app/h2_backup
-        {{- end }}
           command: ["sh", "/etc/config/run.sh"]
           ports:
             - name: http
