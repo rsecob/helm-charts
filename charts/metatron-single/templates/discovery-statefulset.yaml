@@ -60,7 +60,7 @@ spec:
           - name: METATRON_DB_TYPE
             value: h2
           - name: METATRON_H2_DATA_DIR
-            value: /app/metatron-discovery/h2db
+            value: /app/metatron-discovery
           - name: METATRON_POLARIS_HOSTNAME
             value: {{ include "metatron-single.name" . }}-{{ .Values.druid.name }}.{{ .Release.Namespace }}.svc
           - name: METATRON_INGESTED_FOLER
