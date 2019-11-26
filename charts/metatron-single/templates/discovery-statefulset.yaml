@@ -59,19 +59,19 @@ spec:
           - name: METATRON_DB_TYPE
             value: h2
           - name: METATRON_H2_DATA_DIR
-            value: /app/h2_backup
+            value: /app/metatron-discovery/h2db
           - name: METATRON_POLARIS_HOSTNAME
             value: {{ include "metatron-single.name" . }}-{{ .Values.druid.name }}.{{ .Release.Namespace }}.svc
           - name: METATRON_INGESTED_FOLER
             value: /ingested
           volumeMounts:
           - name: config-volume
-            mountPath: /etc/config
+            mountPath: /app/metatron-discovery/config
           - name: ingested-volume
             mountPath: /ingested
           - name: h2-backup
-            mountPath: /app/h2_backup
-          command: ["sh", "/etc/config/run.sh"]
+            mountPath: /app/metatron-discovery/h2db
+          command: ["sh", "/app/metatron-discovery/config/run.sh"]
           ports:
             - name: http
               containerPort: 8180
