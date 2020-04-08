@@ -1,0 +1,104 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "doccano.fullname" . }}
+  labels:
+    {{- include "doccano.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "doccano.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+{{ toYaml .Values.podAnnotations | trim | indent 8 }}
+      labels:
+        {{- include "doccano.selectorLabels" . | nindent 8 }}
+{{ toYaml .Values.podLabels | trim | indent 8 }}
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      serviceAccountName: {{ include "doccano.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["bash", "-c", "/scripts/set-db-uri-and-run.sh"]
+          env:
+            - name: DEBUG
+              value: {{ if .Values.debug }} "True" {{ else }} "False" {{ end }}
+            - name: PORT
+              value: {{ .Values.port | quote }}
+            - name: ALLOW_SIGNUP
+              value: {{ if .Values.allowSignUp }} "True" {{ else }} "False" {{ end }}
+            - name: ADMIN_EMAIL
+              value: {{ .Values.admin.email }}
+            - name: ADMIN_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ or .Values.admin.existingSecret (printf "%s-admin" (include "doccano.fullname" .)) }}
+                  key: {{ or .Values.admin.existingSecretUsernameKey "username" }}
+            - name: ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ or .Values.admin.existingSecret (printf "%s-admin" (include "doccano.fullname" .)) }}
+                  key: {{ or .Values.admin.existingSecretPasswordKey "password" }}     
+            - name: DATABASE_TYPE
+              value: {{ .Values.database.type | lower }}
+            {{- if ne (.Values.database.type | lower) "sqlite" }}
+            - name: DATABASE_HOST
+              value: {{ .Values.database.host | quote }}
+            - name: DATABASE_PORT
+              value: {{ .Values.database.port | quote }}
+            - name: DATABASE_NAME
+              value: {{ .Values.database.dbname | quote }}
+            - name: DATABASE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ or .Values.database.existingSecret (printf "%s-database" (include "doccano.fullname" .)) }}
+                  key: {{ or .Values.admin.existingSecretUsernameKey "username" }}
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ or .Values.database.existingSecret (printf "%s-database" (include "doccano.fullname" .)) }}
+                  key: {{ or .Values.admin.existingSecretPaswordKey "password" }}
+            {{- end }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.port }}
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+            - name: config-scripts
+              mountPath: /scripts
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      volumes:
+      - name: tmp
+        emptyDir: {}
+      - name: config-scripts
+        configMap:
+          name: {{ template "doccano.name" . }}-config-scripts
+          defaultMode: 0755
+
+        

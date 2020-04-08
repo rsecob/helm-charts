@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "doccano.name" . }}-config-scripts
+data:
+  set-db-uri-and-run.sh: |-
+    if [[ "${DATABASE_TYPE}" = "postgres" ]]; then
+      export DATABASE_URL="postgres://$DATABASE_USERNAME:$DATABASE_PASSWORD@$DATABASE_HOST:$DATABASE_PORT/$DATABASE_NAME?sslmode=disable"
+    elif [[ "${DATABASE_TYPE}" = "mssql" ]]; then
+      export DATABASE_URL="mssql://$DATABASE_USERNAME:$DATABASE_PASSWORD@$DATABASE_HOST:$DATABASE_PORT/$DATABASE_NAME?sslmode=disable"
+    elif [[ "${DATABASE_TYPE}" = "mysql" ]]; then
+      export DATABASE_URL="mysql://$DATABASE_USERNAME:$DATABASE_PASSWORD@$DATABASE_HOST:$DATABASE_PORT/$DATABASE_NAME"
+    fi
+
+    /doccano/tools/run.sh

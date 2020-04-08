@@ -1,0 +1,12 @@
+apiVersion: v2
+name: doccano
+description: Open source text annotation tool for machine learning practitioner
+type: application
+version: 0.1.0
+appVersion: latest
+maintainers:
+  - name: rsecob
+    email: bocesr@gmail.com
+home: https://github.com/doccano/doccano
+sources:
+  - https://github.com/rsecob/helm-charts
