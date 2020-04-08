@@ -1,9 +1,26 @@
 apiVersion: v1
 entries:
+  doccano:
+  - apiVersion: v2
+    appVersion: latest
+    created: "2020-04-07T22:26:52.800595-04:00"
+    description: Open source text annotation tool for machine learning practitioner
+    digest: c20e7a7c81cdadf2e5dcfeaa6ba68705c51cbff682f14baa905bb13521b209ed
+    home: https://github.com/doccano/doccano
+    maintainers:
+    - email: bocesr@gmail.com
+      name: rsecob
+    name: doccano
+    sources:
+    - https://github.com/rsecob/helm-charts
+    type: application
+    urls:
+    - https://rsecob.github.io/helm-charts/doccano-0.1.0.tgz
+    version: 0.1.0
   metatron-single:
   - apiVersion: v1
     appVersion: "1.0"
-    created: "2019-11-26T13:38:01.755243-05:00"
+    created: "2020-04-07T22:26:52.804879-04:00"
     description: A Helm chart for single node of Metatron Discovery
     digest: 401805e1ba676a893a46577e6bf165c1ab384536cbf70efeff4ea393bfebb8a2
     name: metatron-single
@@ -12,7 +29,7 @@ entries:
     version: 0.1.4
   - apiVersion: v1
     appVersion: "1.0"
-    created: "2019-11-26T13:38:01.754753-05:00"
+    created: "2020-04-07T22:26:52.804274-04:00"
     description: A Helm chart for single node of Metatron Discovery
     digest: da919ec7acca9e90b40de6769d342a5b91a12a398d316f650de3bd2b9160d4a4
     name: metatron-single
@@ -21,7 +38,7 @@ entries:
     version: 0.1.3
   - apiVersion: v1
     appVersion: "1.0"
-    created: "2019-11-26T13:38:01.754246-05:00"
+    created: "2020-04-07T22:26:52.803542-04:00"
     description: A Helm chart for single node of Metatron Discovery
     digest: 08afdea53dea93b75e80d1cae6f4e4bb3ec2fa79edf0d185da290649bab18c4d
     name: metatron-single
@@ -30,7 +47,7 @@ entries:
     version: 0.1.2
   - apiVersion: v1
     appVersion: "1.0"
-    created: "2019-11-26T13:38:01.753721-05:00"
+    created: "2020-04-07T22:26:52.802617-04:00"
     description: A Helm chart for single node of Metatron Discovery
     digest: d4d40ea3fff518c62575a44635ec18de64ff1fa8ad64f846c2b77cf597dae65c
     name: metatron-single
@@ -39,11 +56,11 @@ entries:
     version: 0.1.1
   - apiVersion: v1
     appVersion: "1.0"
-    created: "2019-11-26T13:38:01.752819-05:00"
+    created: "2020-04-07T22:26:52.801414-04:00"
     description: A Helm chart for single node of Metatron Discovery
     digest: a540008af7489d26cb2ea0dbae89f6197d7962bc3d9e6c7223efb6aa8ec34eaa
     name: metatron-single
     urls:
     - https://rsecob.github.io/helm-charts/metatron-single-0.1.0.tgz
     version: 0.1.0
-generated: "2019-11-26T13:38:01.75085-05:00"
+generated: "2020-04-07T22:26:52.794968-04:00"
