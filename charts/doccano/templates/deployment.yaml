@@ -15,7 +15,9 @@ spec:
 {{ toYaml .Values.podAnnotations | trim | indent 8 }}
       labels:
         {{- include "doccano.selectorLabels" . | nindent 8 }}
+{{ if .Values.podLabels }}
 {{ toYaml .Values.podLabels | trim | indent 8 }}
+{{ end }}
     spec:
     {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
