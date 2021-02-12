@@ -83,6 +83,10 @@ spec:
               mountPath: /tmp
             - name: config-scripts
               mountPath: /scripts
+            {{- if eq .Values.database.type "sqlite" }}
+            - name: data
+              mountPath: /data
+            {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -102,5 +106,11 @@ spec:
         configMap:
           name: {{ template "doccano.name" . }}-config-scripts
           defaultMode: 0755
+      {{- if eq .Values.database.type "sqlite" }}
+      - name: data
+        hostPath:
+          path: /data/{{ .Release.Namespace }}/{{ .Release.Name }}/data
+          type: DirectoryOrCreate      
+      {{- end }}
 
         
